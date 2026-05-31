@@ -478,8 +478,8 @@
             if(cfg){elements.cardFront.parentElement.classList.add(cfg.glow);elements.cardFront.parentElement.style.border=`3px solid ${getComputedStyle(document.querySelector('.'+cfg.color)).backgroundColor}`;}
             setTimeout(()=>{
               elements.drawBtn.textContent='再次抽取';elements.drawBtn.disabled=false;
-              elements.winText.innerText=`恭喜“${appData.nickname}”首月通关`;
-              elements.winModal.classList.remove('hidden');
+              elements.winText.innerText=`恭喜”${appData.nickname}”首月通关`;
+              elements.winModal.classList.remove('hidden');showCardDetailModal(card);
             },800);
           },600);
         },300);

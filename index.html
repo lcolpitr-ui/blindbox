@@ -111,7 +111,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div class="bg-white rounded-xl p-6 card-shadow card-hover ink-border ink-border-hover">
           <div class="relative mb-4">
-            <img src="" alt="墨韵系列" class="w-full h-48 object-cover rounded-lg" id="coverImg">
+            <img src="images/cover.png" alt="墨韵系列" class="w-full h-48 object-cover rounded-lg">
             <div class="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-full">一季度一月</div>
           </div>
           <h3 class="text-xl font-serif font-bold mb-2">能歌善舞一月通关卡</h3>
@@ -140,7 +140,7 @@
         <h2 class="text-3xl font-serif font-bold mb-8 text-primary">拈取卡片</h2>
         <div class="relative mb-8">
           <div id="blindBoxContainer" class="w-64 h-64 mx-auto relative animate-float">
-            <img id="blindBoxImage" src="" alt="盲盒" class="w-full h-full object-contain">
+            <img id="blindBoxImage" src="images/cover.png" alt="盲盒" class="w-full h-full object-contain">
           </div>
           <div id="cardRevealContainer" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-64">
             <div id="cardElement" class="w-full h-full relative transform-style-preserve-3d">
@@ -336,15 +336,15 @@
         ink: {
           name: '能歌善舞一月通关卡',
           cards: [
-            {id:'ink-001',name:'歌舞法活动讨论1',image:cardImg('ink-001','歌舞法讨论1','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
-            {id:'ink-002',name:'歌舞法活动讨论2',image:cardImg('ink-002','歌舞法讨论2','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
-            {id:'ink-003',name:'歌舞法活动讨论3',image:cardImg('ink-003','歌舞法讨论3','epic'),rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
-            {id:'ink-004',name:'歌舞法活动讨论4',image:cardImg('ink-004','歌舞法讨论4','epic'),rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
-            {id:'ink-005',name:'彩色舞者',image:cardImg('ink-005','彩色舞者','legendary'),rarity:'legendary',description:'彩色水墨风格的舞者形象',probability:0.05},
-            {id:'ink-006',name:'青暖墨韵1',image:cardImg('ink-006','青暖墨韵1','rare'),rarity:'rare',description:'青暖墨韵限定盲盒',probability:0.15},
-            {id:'ink-007',name:'青暖墨韵2',image:cardImg('ink-007','青暖墨韵2','epic'),rarity:'epic',description:'青暖墨韵限定盲盒',probability:0.1},
-            {id:'ink-008',name:'山水意境',image:cardImg('ink-008','山水意境','legendary'),rarity:'legendary',description:'水墨山水意境图',probability:0.05},
-            {id:'ink-009',name:'歌舞法活动讨论5',image:cardImg('ink-009','歌舞法讨论5','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15}
+            {id:'ink-001',name:'歌舞法活动讨论1',image:'images/card-01.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-002',name:'歌舞法活动讨论2',image:'images/card-02.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-003',name:'歌舞法活动讨论3',image:'images/card-03.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-004',name:'歌舞法活动讨论4',image:'images/card-04.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-005',name:'彩色舞者',image:'images/card-05.png',rarity:'legendary',description:'彩色水墨风格的舞者形象',probability:0.05},
+            {id:'ink-006',name:'青暖墨韵1',image:'images/card-06.png',rarity:'rare',description:'青暖墨韵限定盲盒',probability:0.15},
+            {id:'ink-007',name:'青暖墨韵2',image:'images/card-07.png',rarity:'epic',description:'青暖墨韵限定盲盒',probability:0.1},
+            {id:'ink-008',name:'山水意境',image:'images/card-08.png',rarity:'legendary',description:'水墨山水意境图',probability:0.05},
+            {id:'ink-009',name:'歌舞法活动讨论5',image:'images/card-09.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15}
           ]
         },
         custom: {name:'我的系列',cards:[]}
@@ -387,10 +387,8 @@
 
     function initApp(){
       loadData();bindEvents();
-      // 设置内嵌 SVG 图片
+      // Logo 和卡背用内嵌 SVG（没有对应的真实图片）
       document.getElementById('logoImg').src = logoImg();
-      document.getElementById('coverImg').src = coverImg();
-      document.getElementById('blindBoxImage').src = blindBoxImg();
       document.getElementById('cardBack').src = cardBackImg();
       // 顶部昵称和卡片里的昵称双向同步
       elements.nicknameInput.value = appData.nickname;

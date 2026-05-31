@@ -5,7 +5,6 @@
   <meta name="description" content="能歌善舞随缘卡匣，法尔如是，不期而遇。来抽一张属于你的水墨卡片吧！">
   <meta property="og:title" content="随缘匣 - 盲盒抽卡">
   <meta property="og:description" content="能歌善舞随缘卡匣，法尔如是，不期而遇。来抽一张属于你的水墨卡片吧！">
-  <meta property="og:image" content="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/967b0cc2563842a793f9c80d9f9292b8~tplv-a9rns2rl98-image.image">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -90,7 +89,7 @@
   <nav class="bg-white bg-opacity-90 backdrop-blur-sm shadow-md sticky top-0 z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/967b0cc2563842a793f9c80d9f9292b8~tplv-a9rns2rl98-image.image" alt="Logo" class="h-10 w-10 object-cover rounded-full">
+        <img src="" alt="Logo" class="h-10 w-10 object-cover rounded-full" id="logoImg">
         <h1 class="text-2xl font-serif font-bold text-primary">随缘匣</h1>
       </div>
       <div class="flex items-center space-x-6">
@@ -112,7 +111,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div class="bg-white rounded-xl p-6 card-shadow card-hover ink-border ink-border-hover">
           <div class="relative mb-4">
-            <img src="https://p11-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/062e64dadb404aa987f4802cc32706ad~tplv-a9rns2rl98-image.image" alt="墨韵系列" class="w-full h-48 object-cover rounded-lg">
+            <img src="" alt="墨韵系列" class="w-full h-48 object-cover rounded-lg" id="coverImg">
             <div class="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-full">一季度一月</div>
           </div>
           <h3 class="text-xl font-serif font-bold mb-2">能歌善舞一月通关卡</h3>
@@ -141,12 +140,12 @@
         <h2 class="text-3xl font-serif font-bold mb-8 text-primary">拈取卡片</h2>
         <div class="relative mb-8">
           <div id="blindBoxContainer" class="w-64 h-64 mx-auto relative animate-float">
-            <img id="blindBoxImage" src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/a71127133915416aa6dc7f211c0b10ec~tplv-a9rns2rl98-image.image" alt="盲盒" class="w-full h-full object-contain">
+            <img id="blindBoxImage" src="" alt="盲盒" class="w-full h-full object-contain">
           </div>
           <div id="cardRevealContainer" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-64">
             <div id="cardElement" class="w-full h-full relative transform-style-preserve-3d">
               <div class="absolute w-full h-full backface-hidden">
-                <img id="cardBack" src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/1a22da82f6d54569a18e306230f6b7ce.png" alt="Card Back" class="w-full h-full object-cover rounded-lg card-shadow">
+                <img id="cardBack" src="" alt="Card Back" class="w-full h-full object-cover rounded-lg card-shadow">
               </div>
               <div class="absolute w-full h-full backface-hidden transform rotate-y-180">
                 <img id="cardFront" src="" alt="Card Front" class="w-full h-full object-cover rounded-lg card-shadow">
@@ -235,6 +234,99 @@
   </div>
 
   <script>
+    // ===== 内嵌 SVG 图片生成器（替代失效的字节CDN图片） =====
+    function cardImg(id, name, rarity) {
+      const palettes = {
+        rare:      { bg: '#E9F5F2', fg: '#4A9D8F', accent: '#2C7A6F', dot: '#34D399', pattern: 'wave' },
+        epic:      { bg: '#F2E9F0', fg: '#9333EA', accent: '#7C3AED', dot: '#A78BFA', pattern: 'diamond' },
+        legendary: { bg: '#FEF3C7', fg: '#D97706', accent: '#B45309', dot: '#FBBF24', pattern: 'star' }
+      };
+      const p = palettes[rarity] || palettes.rare;
+      const hash = id.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+      const h = hash % 360;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="560" viewBox="0 0 400 560">
+        <defs>
+          <linearGradient id="g${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:${p.bg};stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:${p.fg};stop-opacity:0.3"/>
+          </linearGradient>
+          <filter id="noise${id}"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="gray"/><feBlend in="SourceGraphic" in2="gray" mode="multiply"/></filter>
+        </defs>
+        <rect width="400" height="560" rx="24" fill="url(#g${id})"/>
+        <!-- 水墨晕染效果 -->
+        <circle cx="${100 + (hash%200)}" cy="${150 + (hash%200)}" r="${80 + (hash%80)}" fill="${p.fg}" opacity="0.08"/>
+        <circle cx="${250 - (hash%100)}" cy="${350 - (hash%100)}" r="${60 + ((hash*3)%80)}" fill="${p.dot}" opacity="0.06"/>
+        <!-- 装饰线条 -->
+        <line x1="40" y1="${300 + (hash%100)}" x2="360" y2="${280 + ((hash*2)%120)}" stroke="${p.fg}" stroke-width="0.5" opacity="0.15"/>
+        <line x1="40" y1="${320 + (hash%80)}" x2="360" y2="${300 + ((hash*3)%100)}" stroke="${p.accent}" stroke-width="0.3" opacity="0.1"/>
+        <!-- 主图：圆形墨韵 -->
+        <circle cx="200" cy="220" r="90" fill="none" stroke="${p.fg}" stroke-width="2" opacity="0.25"/>
+        <circle cx="200" cy="220" r="75" fill="${p.fg}" opacity="0.12"/>
+        <circle cx="200" cy="220" r="55" fill="${p.fg}" opacity="0.18"/>
+        <!-- 中心符号 -->
+        <text x="200" y="232" text-anchor="middle" font-family="serif" font-size="48" fill="${p.accent}" opacity="0.6">${name.charAt(0)}</text>
+        <!-- 底部文字 -->
+        <rect x="40" y="440" width="320" height="80" rx="12" fill="white" opacity="0.85"/>
+        <text x="200" y="478" text-anchor="middle" font-family="sans-serif" font-size="22" fill="${p.accent}" font-weight="bold">${name}</text>
+        <text x="200" y="505" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#999">#${id}</text>
+        <!-- 稀有度标记 -->
+        <circle cx="360" cy="40" r="16" fill="${p.fg}" opacity="0.2"/>
+        <circle cx="360" cy="40" r="8" fill="${p.accent}"/>
+      </svg>`;
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+    }
+
+    function logoImg() {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+          <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4A9D8F"/><stop offset="100%" style="stop-color:#2C7A6F"/></linearGradient></defs>
+          <circle cx="50" cy="50" r="48" fill="url(#lg)"/>
+          <text x="50" y="62" text-anchor="middle" font-family="serif" font-size="40" fill="white" font-weight="bold">匣</text>
+        </svg>`
+      )));
+    }
+
+    function blindBoxImg() {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+          <defs><linearGradient id="bbg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4A9D8F"/><stop offset="100%" style="stop-color:#2C7A6F"/></linearGradient></defs>
+          <rect x="40" y="60" width="240" height="200" rx="24" fill="url(#bbg)" stroke="#2C7A6F" stroke-width="3"/>
+          <rect x="60" y="80" width="200" height="160" rx="16" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+          <circle cx="160" cy="160" r="40" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+          <text x="160" y="172" text-anchor="middle" font-family="serif" font-size="36" fill="white" opacity="0.9">?</text>
+          <rect x="130" y="280" width="60" height="16" rx="8" fill="#2C7A6F" opacity="0.5"/>
+        </svg>`
+      )));
+    }
+
+    function cardBackImg() {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="560" viewBox="0 0 400 560">
+          <defs><linearGradient id="cbg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4A9D8F"/><stop offset="100%" style="stop-color:#1D5248"/></linearGradient></defs>
+          <rect width="400" height="560" rx="24" fill="url(#cbg)"/>
+          <rect x="24" y="24" width="352" height="512" rx="16" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+          <rect x="40" y="40" width="320" height="480" rx="12" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <circle cx="200" cy="260" r="70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+          <circle cx="200" cy="260" r="50" fill="rgba(255,255,255,0.08)"/>
+          <text x="200" y="278" text-anchor="middle" font-family="serif" font-size="56" fill="rgba(255,255,255,0.6)">匣</text>
+        </svg>`
+      )));
+    }
+
+    function coverImg() {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+          <defs><linearGradient id="cvg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E9F5F2"/><stop offset="100%" style="stop-color:#4A9D8F"/></linearGradient></defs>
+          <rect width="600" height="400" fill="url(#cvg)"/>
+          <circle cx="180" cy="160" r="100" fill="white" opacity="0.2"/>
+          <circle cx="420" cy="240" r="140" fill="white" opacity="0.1"/>
+          <text x="300" y="180" text-anchor="middle" font-family="serif" font-size="48" fill="#2C7A6F" opacity="0.5">能歌善舞</text>
+          <text x="300" y="240" text-anchor="middle" font-family="serif" font-size="72" fill="white" font-weight="bold">随缘匣</text>
+          <text x="300" y="290" text-anchor="middle" font-family="sans-serif" font-size="20" fill="white" opacity="0.7">法尔如是 · 不期而遇</text>
+        </svg>`
+      )));
+    }
+
     const appData = {
       currentSeries: 'ink',
       collection: [],
@@ -244,15 +336,15 @@
         ink: {
           name: '能歌善舞一月通关卡',
           cards: [
-            {id:'ink-001',name:'歌舞法活动讨论1',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/75cd691538ef4391a5bd703b706476c6.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
-            {id:'ink-002',name:'歌舞法活动讨论2',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/52f531b55c6242fb802a00a34cc77154.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
-            {id:'ink-003',name:'歌舞法活动讨论3',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/aeeeecddbe4d4893bc78832b5ccca620.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
-            {id:'ink-004',name:'歌舞法活动讨论4',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/2151e4e549e0418ba037894c11767093.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
-            {id:'ink-005',name:'彩色舞者',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/fe757eed6e824911a997debf85953bcd.jpg',rarity:'legendary',description:'彩色水墨风格的舞者形象',probability:0.05},
-            {id:'ink-006',name:'青暖墨韵1',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/ff1d27a5dbc1428e8e8f484c89e5c8d8.png',rarity:'rare',description:'青暖墨韵限定盲盒',probability:0.15},
-            {id:'ink-007',name:'青暖墨韵2',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/2221273ef20f4b499d9e49089f253db1.png',rarity:'epic',description:'青暖墨韵限定盲盒',probability:0.1},
-            {id:'ink-008',name:'山水意境',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/784a330caeff487993cf1d433695df38.png',rarity:'legendary',description:'水墨山水意境图',probability:0.05},
-            {id:'ink-009',name:'歌舞法活动讨论5',image:'https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/aa920f3db3dc475f93674eea374994b0.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15}
+            {id:'ink-001',name:'歌舞法活动讨论1',image:cardImg('ink-001','歌舞法讨论1','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-002',name:'歌舞法活动讨论2',image:cardImg('ink-002','歌舞法讨论2','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-003',name:'歌舞法活动讨论3',image:cardImg('ink-003','歌舞法讨论3','epic'),rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-004',name:'歌舞法活动讨论4',image:cardImg('ink-004','歌舞法讨论4','epic'),rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-005',name:'彩色舞者',image:cardImg('ink-005','彩色舞者','legendary'),rarity:'legendary',description:'彩色水墨风格的舞者形象',probability:0.05},
+            {id:'ink-006',name:'青暖墨韵1',image:cardImg('ink-006','青暖墨韵1','rare'),rarity:'rare',description:'青暖墨韵限定盲盒',probability:0.15},
+            {id:'ink-007',name:'青暖墨韵2',image:cardImg('ink-007','青暖墨韵2','epic'),rarity:'epic',description:'青暖墨韵限定盲盒',probability:0.1},
+            {id:'ink-008',name:'山水意境',image:cardImg('ink-008','山水意境','legendary'),rarity:'legendary',description:'水墨山水意境图',probability:0.05},
+            {id:'ink-009',name:'歌舞法活动讨论5',image:cardImg('ink-009','歌舞法讨论5','rare'),rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15}
           ]
         },
         custom: {name:'我的系列',cards:[]}
@@ -295,6 +387,11 @@
 
     function initApp(){
       loadData();bindEvents();
+      // 设置内嵌 SVG 图片
+      document.getElementById('logoImg').src = logoImg();
+      document.getElementById('coverImg').src = coverImg();
+      document.getElementById('blindBoxImage').src = blindBoxImg();
+      document.getElementById('cardBack').src = cardBackImg();
       // 顶部昵称和卡片里的昵称双向同步
       elements.nicknameInput.value = appData.nickname;
       elements.cardNickInput.value = appData.nickname;

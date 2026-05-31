@@ -136,23 +136,43 @@
     </section>
 
     <section id="drawSection" class="hidden">
-      <div class="max-w-2xl mx-auto text-center">
-        <h2 class="text-3xl font-serif font-bold mb-8 text-primary">拈取卡片</h2>
-        <div class="relative mb-8">
-          <div id="blindBoxContainer" class="mx-auto relative animate-float" style="width:180px;height:300px">
-            <img id="blindBoxImage" src="images/cover.png" alt="盲盒" class="w-full h-full object-cover rounded-xl">
+      <div class="max-w-lg mx-auto text-center">
+        <h2 class="text-3xl font-serif font-bold mb-6 text-primary">拈取卡片</h2>
+
+        <!-- 盲盒 / 卡片展示区 -->
+        <div class="relative mb-4 flex justify-center">
+          <div id="blindBoxContainer" class="animate-float cursor-pointer" style="width:180px;height:280px">
+            <img id="blindBoxImage" src="images/cover.png" alt="盲盒" class="w-full h-full object-cover rounded-2xl shadow-lg">
           </div>
-          <div id="cardRevealContainer" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2" style="width:180px;height:300px">
-            <div id="cardElement" class="w-full h-full relative transform-style-preserve-3d">
-              <div class="absolute w-full h-full backface-hidden">
-                <img id="cardBack" src="" alt="Card Back" class="w-full h-full object-contain rounded-xl card-shadow">
+          <div id="cardRevealContainer" class="hidden" style="width:180px;height:280px">
+            <div id="cardElement" class="w-full h-full relative" style="transform-style:preserve-3d">
+              <div class="absolute w-full h-full" style="backface-visibility:hidden">
+                <img id="cardBack" src="" alt="Card Back" class="w-full h-full object-cover rounded-2xl shadow-lg">
               </div>
-              <div class="absolute w-full h-full backface-hidden transform rotate-y-180">
-                <img id="cardFront" src="" alt="Card Front" class="w-full h-full object-contain rounded-xl card-shadow">
+              <div id="cardFrontWrap" class="absolute w-full h-full" style="backface-visibility:hidden;transform:rotateY(180deg)">
+                <img id="cardFront" src="" alt="Card Front" class="w-full h-full object-cover rounded-2xl shadow-lg cursor-pointer">
               </div>
             </div>
           </div>
         </div>
+
+        <!-- 抽卡结果信息（内联展示，不用弹窗） -->
+        <div id="cardResultInfo" class="hidden bg-white rounded-2xl p-5 mb-4 card-shadow animate-slide-up max-w-xs mx-auto">
+          <h3 id="resultCardName" class="text-lg font-bold text-gray-800 mb-1"></h3>
+          <span id="resultRarityBadge" class="inline-block px-3 py-0.5 rounded-full text-white text-xs font-medium mb-3"></span>
+          <div class="text-left space-y-2 text-sm border-t pt-3">
+            <div class="flex justify-between"><span class="text-gray-400">系列</span><span id="resultSeries" class="text-gray-700"></span></div>
+            <div class="flex justify-between"><span class="text-gray-400">获取时间</span><span id="resultDate" class="text-gray-700"></span></div>
+            <div class="flex justify-between"><span class="text-gray-400">编号</span><span id="resultId" class="text-gray-700"></span></div>
+          </div>
+        </div>
+
+        <!-- Toast 提示 -->
+        <div id="drawToast" class="hidden mb-3 animate-slide-up">
+          <span id="toastText" class="inline-block px-6 py-2 rounded-full bg-primary text-white text-base font-medium shadow-lg"></span>
+        </div>
+
+        <!-- 按钮 -->
         <div class="flex justify-center space-x-4">
           <button id="drawBtn" class="px-6 py-3 rounded-full bg-primary text-white hover:bg-opacity-90 transition-all text-lg font-medium">开始抽取</button>
           <button id="backToBoxesBtn" class="px-6 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all text-lg font-medium">返回重选</button>
@@ -356,13 +376,15 @@
       }
     };
 
+    const rarityColors = {
+      rare:      { border:'#4A9D8F', glow:'0 0 15px rgba(74,157,143,0.6)', bg:'#4A9D8F', name:'稀有' },
+      epic:      { border:'#9333EA', glow:'0 0 15px rgba(147,51,234,0.6)', bg:'#9333EA', name:'史诗' },
+      legendary: { border:'#D97706', glow:'0 0 15px rgba(251,191,36,0.6), 0 0 30px rgba(251,191,36,0.3)', bg:'#D97706', name:'传奇' }
+    };
+
     const elements = {
       nicknameInput:document.getElementById('nicknameInput'),
       cardNickInput:document.getElementById('cardNickInput'),
-      winModal:document.getElementById('winModal'),
-      winText:document.getElementById('winText'),
-      closeWinBtn:document.getElementById('closeWinBtn'),
-      backToHomeBtn:document.getElementById('backToHomeBtn'),
       blindBoxSection:document.getElementById('blindBoxSection'),
       drawSection:document.getElementById('drawSection'),
       collectionSection:document.getElementById('collectionSection'),
@@ -374,8 +396,16 @@
       cardRevealContainer:document.getElementById('cardRevealContainer'),
       cardElement:document.getElementById('cardElement'),
       cardFront:document.getElementById('cardFront'),
+      cardFrontWrap:document.getElementById('cardFrontWrap'),
       cardBack:document.getElementById('cardBack'),
-      blindBoxImage:document.getElementById('blindBoxImage'),
+      cardResultInfo:document.getElementById('cardResultInfo'),
+      resultCardName:document.getElementById('resultCardName'),
+      resultRarityBadge:document.getElementById('resultRarityBadge'),
+      resultSeries:document.getElementById('resultSeries'),
+      resultDate:document.getElementById('resultDate'),
+      resultId:document.getElementById('resultId'),
+      drawToast:document.getElementById('drawToast'),
+      toastText:document.getElementById('toastText'),
       collectionGrid:document.getElementById('collectionGrid'),
       cardDetailModal:document.getElementById('cardDetailModal'),
       closeDetailBtn:document.getElementById('closeDetailBtn'),
@@ -404,9 +434,7 @@
       localStorage.setItem('blindBoxCustomCards',JSON.stringify(appData.customCards));
       localStorage.setItem('blindbox_nickname',appData.nickname);
     }
-    function backToHomeFromWinModal(){elements.winModal.classList.add('hidden');showBlindBoxSection();}
     function bindEvents(){
-      // 双向同步昵称
       elements.nicknameInput.addEventListener('input',()=>{
         appData.nickname=elements.nicknameInput.value.trim();
         elements.cardNickInput.value = appData.nickname;
@@ -418,13 +446,15 @@
         saveData();
       });
 
-      elements.closeWinBtn.addEventListener('click',()=>elements.winModal.classList.add('hidden'));
-      elements.backToHomeBtn.addEventListener('click',backToHomeFromWinModal);
       elements.collectionBtn.addEventListener('click',showCollectionSection);
       elements.backFromCollectionBtn.addEventListener('click',showBlindBoxSection);
       elements.backToBoxesBtn.addEventListener('click',showBlindBoxSection);
       document.querySelectorAll('.blind-box-btn').forEach(b=>b.addEventListener('click',()=>selectBlindBox(b.dataset.series)));
       elements.drawBtn.addEventListener('click',drawCard);
+      // 点击已翻开的卡片 → 查看详情弹窗
+      elements.cardFront.addEventListener('click',()=>{
+        if(elements.cardFront._drawnCard) showCardDetailModal(elements.cardFront._drawnCard);
+      });
       document.querySelectorAll('.collection-filter').forEach(b=>{
         b.addEventListener('click',()=>{
           document.querySelectorAll('.collection-filter').forEach(x=>{x.classList.remove('bg-primary','text-white');x.classList.add('bg-gray-200','text-gray-700');});
@@ -435,21 +465,45 @@
       elements.cardDetailModal.addEventListener('click',e=>{if(e.target===elements.cardDetailModal)elements.cardDetailModal.classList.add('hidden');});
       elements.closeDetailBtn.addEventListener('click',()=>elements.cardDetailModal.classList.add('hidden'));
     }
-    function showBlindBoxSection(){elements.blindBoxSection.classList.remove('hidden');elements.drawSection.classList.add('hidden');elements.collectionSection.classList.add('hidden');}
-    function showDrawSection(){
-      elements.blindBoxSection.classList.add('hidden');elements.drawSection.classList.remove('hidden');elements.collectionSection.classList.add('hidden');
-      elements.cardRevealContainer.classList.add('hidden');elements.blindBoxContainer.classList.remove('hidden');
-      elements.drawBtn.textContent='开始抽取';elements.drawBtn.disabled=false;
+    function showBlindBoxSection(){
+      elements.blindBoxSection.classList.remove('hidden');
+      elements.drawSection.classList.add('hidden');
+      elements.collectionSection.classList.add('hidden');
     }
-    function showCollectionSection(){elements.blindBoxSection.classList.add('hidden');elements.drawSection.classList.add('hidden');elements.collectionSection.classList.remove('hidden');renderCollection();}
+    function showDrawSection(){
+      elements.blindBoxSection.classList.add('hidden');
+      elements.drawSection.classList.remove('hidden');
+      elements.collectionSection.classList.add('hidden');
+      // 重置抽卡状态
+      elements.cardRevealContainer.classList.add('hidden');
+      elements.blindBoxContainer.classList.remove('hidden');
+      elements.cardResultInfo.classList.add('hidden');
+      elements.drawToast.classList.add('hidden');
+      elements.drawBtn.textContent='开始抽取';
+      elements.drawBtn.disabled=false;
+      elements.cardElement.style.transform='rotateY(0deg) scale(0.8)';
+      elements.cardFrontWrap.style.boxShadow='none';
+      elements.cardFrontWrap.style.border='none';
+    }
+    function showCollectionSection(){
+      elements.blindBoxSection.classList.add('hidden');
+      elements.drawSection.classList.add('hidden');
+      elements.collectionSection.classList.remove('hidden');
+      renderCollection();
+    }
     function selectBlindBox(s){appData.currentSeries=s;showDrawSection();}
     function drawCard(){
-      const n=elements.nicknameInput.value.trim();if(!n){alert('请先输入昵称！');return;}
+      const n=elements.nicknameInput.value.trim();
+      if(!n){alert('请先输入昵称！');return;}
       appData.nickname=n;saveData();
-      elements.drawBtn.disabled=true;elements.drawBtn.textContent='抽取中...';
+      elements.drawBtn.disabled=true;
+      elements.drawBtn.textContent='抽取中...';
+      elements.cardResultInfo.classList.add('hidden');
+      elements.drawToast.classList.add('hidden');
       const card=selectRandomCard(appData.cardSeries[appData.currentSeries].cards);
       const item={...card,acquiredDate:new Date().toISOString(),series:appData.currentSeries};
-      appData.collection.push(item);saveData();performDrawAnimation(item);
+      appData.collection.push(item);saveData();
+      performDrawAnimation(item);
     }
     function selectRandomCard(arr){
       let r=Math.random(),s=0;
@@ -467,33 +521,63 @@
       }
     }
     function performDrawAnimation(card){
-      elements.blindBoxContainer.classList.add('animate-shake');createParticleEffect(elements.blindBoxContainer);
+      // 保存当前卡片引用，供点击时查看详情
+      elements.cardFront._drawnCard = card;
+      // 阶段1: 盲盒抖动 + 粒子
+      elements.blindBoxContainer.classList.add('animate-shake');
+      createParticleEffect(elements.blindBoxContainer);
+
       setTimeout(()=>{
-        elements.blindBoxContainer.classList.add('hidden');elements.cardRevealContainer.classList.remove('hidden');
-        elements.cardElement.style.transform='rotateY(0deg) scale(0.8)';elements.cardFront.src=card.image;
+        // 阶段2: 盲盒消失 → 卡片出现（缩小状态）
+        elements.blindBoxContainer.classList.add('hidden');
+        elements.cardRevealContainer.classList.remove('hidden');
+        elements.cardElement.style.transition='none';
+        elements.cardElement.style.transform='rotateY(0deg) scale(0.8)';
+        elements.cardFront.src=card.image;
+
         setTimeout(()=>{
+          // 阶段3: 卡片翻转
+          elements.cardElement.style.transition='transform 0.8s ease-in-out';
           elements.cardElement.style.transform='rotateY(180deg) scale(1)';
+
           setTimeout(()=>{
-            const cfg=appData.rarityConfig[card.rarity];
-            if(cfg){elements.cardFront.parentElement.classList.add(cfg.glow);elements.cardFront.parentElement.style.border=`3px solid ${getComputedStyle(document.querySelector('.'+cfg.color)).backgroundColor}`;}
-            setTimeout(()=>{
-              elements.drawBtn.textContent='再次抽取';elements.drawBtn.disabled=false;
-              elements.winText.innerText=`恭喜”${appData.nickname}”首月通关`;
-              elements.winModal.classList.remove('hidden');showCardDetailModal(card);
-            },800);
+            // 阶段4: 施加稀有度光效 + 显示结果信息 + Toast
+            const rc = rarityColors[card.rarity] || rarityColors.rare;
+            elements.cardFrontWrap.style.boxShadow = rc.glow;
+            elements.cardFrontWrap.style.border = `4px solid ${rc.border}`;
+            elements.cardFrontWrap.style.borderRadius = '16px';
+
+            // 填充内联结果信息
+            elements.resultCardName.textContent = card.name;
+            elements.resultRarityBadge.textContent = rc.name;
+            elements.resultRarityBadge.style.backgroundColor = rc.bg;
+            elements.resultSeries.textContent = appData.cardSeries[card.series].name;
+            const d = new Date(card.acquiredDate);
+            elements.resultDate.textContent = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            elements.resultId.textContent = card.id;
+            elements.cardResultInfo.classList.remove('hidden');
+
+            // Toast
+            elements.toastText.textContent = `🎉 恭喜”${appData.nickname}”获得${rc.name}卡片！`;
+            elements.drawToast.classList.remove('hidden');
+
+            // 按钮状态
+            elements.drawBtn.textContent='再抽一次';
+            elements.drawBtn.disabled=false;
           },600);
         },300);
       },1200);
     }
     function showCardDetailModal(card){
-      const cfg=appData.rarityConfig[card.rarity];
-      elements.modalCardImage.src=card.image;
-      elements.modalCardRarity.textContent=cfg.name;
-      elements.modalCardRarity.className=`px-2 py-1 rounded-full text-white text-xs font-medium shadow-lg ${cfg.color}`;
-      elements.modalCardSeries.textContent=appData.cardSeries[card.series].name;
-      const d=new Date(card.acquiredDate);
-      elements.modalCardDate.textContent=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      elements.modalCardId.textContent=card.id;
+      const rc = rarityColors[card.rarity] || rarityColors.rare;
+      elements.modalCardImage.src = card.image;
+      elements.modalCardRarity.textContent = rc.name;
+      elements.modalCardRarity.style.backgroundColor = rc.bg;
+      elements.modalCardRarity.className = 'px-2 py-1 rounded-full text-white text-xs font-medium shadow-lg';
+      elements.modalCardSeries.textContent = appData.cardSeries[card.series].name;
+      const d = new Date(card.acquiredDate);
+      elements.modalCardDate.textContent = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      elements.modalCardId.textContent = card.id;
       elements.cardDetailModal.classList.remove('hidden');
     }
     function renderCollection(filter='all'){

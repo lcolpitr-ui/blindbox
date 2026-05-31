@@ -1,0 +1,419 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>随缘匣 - 盲盒抽卡</title>
+  <meta name="description" content="能歌善舞随缘卡匣，法尔如是，不期而遇。来抽一张属于你的水墨卡片吧！">
+  <meta property="og:title" content="随缘匣 - 盲盒抽卡">
+  <meta property="og:description" content="能歌善舞随缘卡匣，法尔如是，不期而遇。来抽一张属于你的水墨卡片吧！">
+  <meta property="og:image" content="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/967b0cc2563842a793f9c80d9f9292b8~tplv-a9rns2rl98-image.image">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4A9D8F',
+            secondary: '#F9C784',
+            accent: '#E76F51',
+            background: '#F5F5F5',
+            card: '#FFFFFF',
+            'card-back': '#E9F5F2',
+            'rare-bg': '#E9F5F2',
+            'epic-bg': '#F2E9F0',
+            'legendary-bg': '#F5F2E9'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'serif']
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+            'shake': 'shake 0.5s ease-in-out',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'flip': 'flip 1s ease-in-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+            'fade-in': 'fadeIn 0.5s ease-out'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' }
+            },
+            shake: {
+              '0%, 100%': { transform: 'rotate(-3deg)' },
+              '50%': { transform: 'rotate(3deg)' }
+            },
+            glow: {
+              '0%': { boxShadow: '0 0 5px rgba(74, 157, 143, 0.5)' },
+              '100%': { boxShadow: '0 0 20px rgba(74, 157, 143, 0.8), 0 0 30px rgba(231, 111, 81, 0.5)' }
+            },
+            flip: {
+              '0%': { transform: 'rotateY(0deg)' },
+              '50%': { transform: 'rotateY(90deg)' },
+              '100%': { transform: 'rotateY(0deg)' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); }
+      .text-shadow-lg { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3); }
+      .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+      .ink-bg { background-image: linear-gradient(135deg, #F5F5F5 0%, #E9F5F2 50%, #F5F2E9 100%); }
+      .ink-border { border: 2px solid rgba(74, 157, 143, 0.3); }
+      .ink-border-hover:hover { border-color: rgba(74, 157, 143, 0.8); }
+      .rarity-glow-rare { box-shadow: 0 0 15px rgba(74, 157, 143, 0.6); }
+      .rarity-glow-epic { box-shadow: 0 0 15px rgba(147, 51, 234, 0.6); }
+      .rarity-glow-legendary { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.3); }
+      .file-input-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    }
+  </style>
+</head>
+<body class="ink-bg min-h-screen font-sans text-gray-800">
+  <nav class="bg-white bg-opacity-90 backdrop-blur-sm shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/967b0cc2563842a793f9c80d9f9292b8~tplv-a9rns2rl98-image.image" alt="Logo" class="h-10 w-10 object-cover rounded-full">
+        <h1 class="text-2xl font-serif font-bold text-primary">随缘匣</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <button id="collectionBtn" class="flex items-center space-x-1 px-4 py-2 rounded-full bg-primary bg-opacity-10 text-primary hover:bg-opacity-20 transition-all">
+          <i class="fa fa-book"></i><span>所集</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto mb-8 bg-white rounded-xl p-4 card-shadow">
+      <label class="block text-sm font-medium mb-2">你的昵称</label>
+      <input id="nicknameInput" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="输入名字，抽卡后显示恭喜XX首月通关">
+    </div>
+
+    <section id="blindBoxSection" class="mb-12">
+      <h2 class="text-3xl font-serif font-bold text-center mb-8 text-primary">能歌善舞.随缘卡匣</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-xl p-6 card-shadow card-hover ink-border ink-border-hover">
+          <div class="relative mb-4">
+            <img src="https://p11-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/062e64dadb404aa987f4802cc32706ad~tplv-a9rns2rl98-image.image" alt="墨韵系列" class="w-full h-48 object-cover rounded-lg">
+            <div class="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-full">一季度一月</div>
+          </div>
+          <h3 class="text-xl font-serif font-bold mb-2">能歌善舞一月通关卡</h3>
+          <p class="text-gray-600 mb-4">欢喜即精进</p>
+          <div class="flex justify-between items-center">
+            <div>
+              <!-- 这里加了【输入框】 -->
+              <span class="text-sm text-gray-500 flex items-center gap-1">
+                【<input id="cardNickInput" type="text" class="w-14 text-center border-b border-gray-300 bg-transparent focus:outline-none focus:border-primary text-sm" placeholder="名字">】
+                许愿抽卡:
+              </span>
+              <div class="flex space-x-1 mt-1">
+                <span class="inline-block w-3 h-3 rounded-full bg-primary"></span>
+                <span class="inline-block w-3 h-3 rounded-full bg-purple-500"></span>
+                <span class="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+              </div>
+            </div>
+            <button class="blind-box-btn px-4 py-2 rounded-full bg-primary text-white hover:bg-opacity-90 transition-all" data-series="ink">抽取</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="drawSection" class="hidden">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-serif font-bold mb-8 text-primary">拈取卡片</h2>
+        <div class="relative mb-8">
+          <div id="blindBoxContainer" class="w-64 h-64 mx-auto relative animate-float">
+            <img id="blindBoxImage" src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/a71127133915416aa6dc7f211c0b10ec~tplv-a9rns2rl98-image.image" alt="盲盒" class="w-full h-full object-contain">
+          </div>
+          <div id="cardRevealContainer" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-64">
+            <div id="cardElement" class="w-full h-full relative transform-style-preserve-3d">
+              <div class="absolute w-full h-full backface-hidden">
+                <img id="cardBack" src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/1a22da82f6d54569a18e306230f6b7ce.png" alt="Card Back" class="w-full h-full object-cover rounded-lg card-shadow">
+              </div>
+              <div class="absolute w-full h-full backface-hidden transform rotate-y-180">
+                <img id="cardFront" src="" alt="Card Front" class="w-full h-full object-cover rounded-lg card-shadow">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center space-x-4">
+          <button id="drawBtn" class="px-6 py-3 rounded-full bg-primary text-white hover:bg-opacity-90 transition-all text-lg font-medium">开始抽取</button>
+          <button id="backToBoxesBtn" class="px-6 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all text-lg font-medium">返回重选</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="collectionSection" class="hidden">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-serif font-bold text-primary">我的收藏</h2>
+        <button id="backFromCollectionBtn" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all">
+          <i class="fa fa-arrow-left mr-2"></i>返回
+        </button>
+      </div>
+      <div class="mb-6">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button class="collection-filter px-4 py-2 rounded-full bg-primary text-white" data-filter="all">全部</button>
+          <button class="collection-filter px-4 py-2 rounded-full bg-gray-200 text-gray-700" data-filter="rare">稀有</button>
+          <button class="collection-filter px-4 py-2 rounded-full bg-gray-200 text-gray-700" data-filter="epic">史诗</button>
+          <button class="collection-filter px-4 py-2 rounded-full bg-gray-200 text-gray-700" data-filter="legendary">传奇</button>
+        </div>
+      </div>
+      <div id="collectionGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div class="text-center col-span-full py-8 text-gray-500">
+          <i class="fa fa-book text-4xl mb-2"></i>
+          <p>你还没有收集任何卡片</p>
+          <p class="text-sm mt-2">快去抽取盲盒吧！</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-white bg-opacity-90 py-6 mt-12">
+    <div class="container mx-auto px-4 text-center text-gray-600">
+      <p>© 2026 能歌善舞随缘卡匣子系列</p>
+      <p class="text-sm mt-2">法尔如是，不期而遇</p>
+    </div>
+  </footer>
+
+  <div id="winModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60] hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+      <div class="text-4xl mb-4">🎉</div>
+      <h2 id="winText" class="text-2xl font-serif font-bold text-primary mb-6"></h2>
+      <div class="flex justify-center gap-4">
+        <button id="closeWinBtn" class="px-6 py-2 rounded-full bg-primary text-white">确定</button>
+        <button id="backToHomeBtn" class="px-6 py-2 rounded-full bg-gray-200 text-gray-700">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardDetailModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-green-400 to-teal-500"></div>
+      <div class="mb-6 relative">
+        <div class="relative z-10 transform transition-transform hover:scale-[1.02] duration-300">
+          <img id="modalCardImage" src="" alt="Card" class="w-full h-80 object-cover rounded-xl card-shadow-lg border-2 border-white">
+          <div class="absolute top-3 right-3 z-20">
+            <span id="modalCardRarity" class="px-3 py-1.5 rounded-full text-white text-sm font-medium shadow-lg">稀有</span>
+          </div>
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-teal-500/10 rounded-xl transform rotate-1 scale-[0.98]"></div>
+      </div>
+      <div class="mb-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">系列</span>
+          <span id="modalCardSeries" class="text-sm font-medium text-gray-800 bg-gray-50 px-3 py-1 rounded-full">能歌善舞一月通关卡</span>
+        </div>
+        <div class="hidden"><p id="modalCardDescription" class="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 italic"></p></div>
+        <div class="flex items-center justify-between text-sm text-gray-500 pt-2 border-t border-gray-100">
+          <span>获取时间</span>
+          <span id="modalCardDate">2026-01-01</span>
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">获取时间: <span id="modalCardDate">2026-01-01</span></span>
+        <span class="text-sm text-gray-500">编号: <span id="modalCardId">#001</span></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const appData = {
+      currentSeries: 'ink',
+      collection: [],
+      customCards: [],
+      nickname: localStorage.getItem('blindbox_nickname') || '',
+      cardSeries: {
+        ink: {
+          name: '能歌善舞一月通关卡',
+          cards: [
+            {id:'ink-001',name:'歌舞法活动讨论1',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/75cd691538ef4391a5bd703b706476c6.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-002',name:'歌舞法活动讨论2',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/52f531b55c6242fb802a00a34cc77154.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15},
+            {id:'ink-003',name:'歌舞法活动讨论3',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/aeeeecddbe4d4893bc78832b5ccca620.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-004',name:'歌舞法活动讨论4',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/2151e4e549e0418ba037894c11767093.png',rarity:'epic',description:'会议纪要：歌舞法活动事宜讨论',probability:0.1},
+            {id:'ink-005',name:'彩色舞者',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/fe757eed6e824911a997debf85953bcd.jpg',rarity:'legendary',description:'彩色水墨风格的舞者形象',probability:0.05},
+            {id:'ink-006',name:'青暖墨韵1',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/ff1d27a5dbc1428e8e8f484c89e5c8d8.png',rarity:'rare',description:'青暖墨韵限定盲盒',probability:0.15},
+            {id:'ink-007',name:'青暖墨韵2',image:'https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/2221273ef20f4b499d9e49089f253db1.png',rarity:'epic',description:'青暖墨韵限定盲盒',probability:0.1},
+            {id:'ink-008',name:'山水意境',image:'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/784a330caeff487993cf1d433695df38.png',rarity:'legendary',description:'水墨山水意境图',probability:0.05},
+            {id:'ink-009',name:'歌舞法活动讨论5',image:'https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/aa920f3db3dc475f93674eea374994b0.png',rarity:'rare',description:'会议纪要：歌舞法活动事宜讨论',probability:0.15}
+          ]
+        },
+        custom: {name:'我的系列',cards:[]}
+      },
+      rarityConfig: {
+        rare:{name:'稀有',color:'bg-primary',glow:'rarity-glow-rare',bg:'bg-rare-bg'},
+        epic:{name:'史诗',color:'bg-purple-500',glow:'rarity-glow-epic',bg:'bg-epic-bg'},
+        legendary:{name:'传奇',color:'bg-yellow-500',glow:'rarity-glow-legendary',bg:'bg-legendary-bg'}
+      }
+    };
+
+    const elements = {
+      nicknameInput:document.getElementById('nicknameInput'),
+      cardNickInput:document.getElementById('cardNickInput'),
+      winModal:document.getElementById('winModal'),
+      winText:document.getElementById('winText'),
+      closeWinBtn:document.getElementById('closeWinBtn'),
+      backToHomeBtn:document.getElementById('backToHomeBtn'),
+      blindBoxSection:document.getElementById('blindBoxSection'),
+      drawSection:document.getElementById('drawSection'),
+      collectionSection:document.getElementById('collectionSection'),
+      collectionBtn:document.getElementById('collectionBtn'),
+      backFromCollectionBtn:document.getElementById('backFromCollectionBtn'),
+      backToBoxesBtn:document.getElementById('backToBoxesBtn'),
+      drawBtn:document.getElementById('drawBtn'),
+      blindBoxContainer:document.getElementById('blindBoxContainer'),
+      cardRevealContainer:document.getElementById('cardRevealContainer'),
+      cardElement:document.getElementById('cardElement'),
+      cardFront:document.getElementById('cardFront'),
+      cardBack:document.getElementById('cardBack'),
+      blindBoxImage:document.getElementById('blindBoxImage'),
+      collectionGrid:document.getElementById('collectionGrid'),
+      cardDetailModal:document.getElementById('cardDetailModal'),
+      modalCardImage:document.getElementById('modalCardImage'),
+      modalCardRarity:document.getElementById('modalCardRarity'),
+      modalCardSeries:document.getElementById('modalCardSeries'),
+      modalCardDate:document.getElementById('modalCardDate'),
+      modalCardId:document.getElementById('modalCardId')
+    };
+
+    function initApp(){
+      loadData();bindEvents();
+      // 顶部昵称和卡片里的昵称双向同步
+      elements.nicknameInput.value = appData.nickname;
+      elements.cardNickInput.value = appData.nickname;
+    }
+    function loadData(){
+      const c=localStorage.getItem('blindBoxCollection'),u=localStorage.getItem('blindBoxCustomCards');
+      if(c)appData.collection=JSON.parse(c);if(u)appData.customCards=JSON.parse(u);
+    }
+    function saveData(){
+      localStorage.setItem('blindBoxCollection',JSON.stringify(appData.collection));
+      localStorage.setItem('blindBoxCustomCards',JSON.stringify(appData.customCards));
+      localStorage.setItem('blindbox_nickname',appData.nickname);
+    }
+    function backToHomeFromWinModal(){elements.winModal.classList.add('hidden');showBlindBoxSection();}
+    function bindEvents(){
+      // 双向同步昵称
+      elements.nicknameInput.addEventListener('input',()=>{
+        appData.nickname=elements.nicknameInput.value.trim();
+        elements.cardNickInput.value = appData.nickname;
+        saveData();
+      });
+      elements.cardNickInput.addEventListener('input',()=>{
+        appData.nickname=elements.cardNickInput.value.trim();
+        elements.nicknameInput.value = appData.nickname;
+        saveData();
+      });
+
+      elements.closeWinBtn.addEventListener('click',()=>elements.winModal.classList.add('hidden'));
+      elements.backToHomeBtn.addEventListener('click',backToHomeFromWinModal);
+      elements.collectionBtn.addEventListener('click',showCollectionSection);
+      elements.backFromCollectionBtn.addEventListener('click',showBlindBoxSection);
+      elements.backToBoxesBtn.addEventListener('click',showBlindBoxSection);
+      document.querySelectorAll('.blind-box-btn').forEach(b=>b.addEventListener('click',()=>selectBlindBox(b.dataset.series)));
+      elements.drawBtn.addEventListener('click',drawCard);
+      document.querySelectorAll('.collection-filter').forEach(b=>{
+        b.addEventListener('click',()=>{
+          document.querySelectorAll('.collection-filter').forEach(x=>{x.classList.remove('bg-primary','text-white');x.classList.add('bg-gray-200','text-gray-700');});
+          b.classList.remove('bg-gray-200','text-gray-700');b.classList.add('bg-primary','text-white');
+          filterCollection(b.dataset.filter);
+        });
+      });
+      elements.cardDetailModal.addEventListener('click',e=>{if(e.target===elements.cardDetailModal)elements.cardDetailModal.classList.add('hidden');});
+    }
+    function showBlindBoxSection(){elements.blindBoxSection.classList.remove('hidden');elements.drawSection.classList.add('hidden');elements.collectionSection.classList.add('hidden');}
+    function showDrawSection(){
+      elements.blindBoxSection.classList.add('hidden');elements.drawSection.classList.remove('hidden');elements.collectionSection.classList.add('hidden');
+      elements.cardRevealContainer.classList.add('hidden');elements.blindBoxContainer.classList.remove('hidden');
+      elements.drawBtn.textContent='开始抽取';elements.drawBtn.disabled=false;
+    }
+    function showCollectionSection(){elements.blindBoxSection.classList.add('hidden');elements.drawSection.classList.add('hidden');elements.collectionSection.classList.remove('hidden');renderCollection();}
+    function selectBlindBox(s){appData.currentSeries=s;showDrawSection();}
+    function drawCard(){
+      const n=elements.nicknameInput.value.trim();if(!n){alert('请先输入昵称！');return;}
+      appData.nickname=n;saveData();
+      elements.drawBtn.disabled=true;elements.drawBtn.textContent='抽取中...';
+      const card=selectRandomCard(appData.cardSeries[appData.currentSeries].cards);
+      const item={...card,acquiredDate:new Date().toISOString(),series:appData.currentSeries};
+      appData.collection.push(item);saveData();performDrawAnimation(item);
+    }
+    function selectRandomCard(arr){
+      let r=Math.random(),s=0;
+      for(let i of arr){s+=i.probability||1/arr.length;if(r<=s)return i;}
+      return arr[arr.length-1];
+    }
+    function createParticleEffect(t){
+      const r=t.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+      for(let i=0;i<20;i++){
+        const p=document.createElement('div');p.className='absolute w-2 h-2 bg-primary rounded-full';
+        p.style.left=x+'px';p.style.top=y+'px';p.style.position='fixed';p.style.zIndex='1000';
+        document.body.appendChild(p);
+        const a=(i/20)*Math.PI*2,d=50+Math.random()*50,du=500+Math.random()*500;
+        p.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(0)`,opacity:0}],{duration:du,easing:'ease-out'}).onfinish=()=>p.remove();
+      }
+    }
+    function performDrawAnimation(card){
+      elements.blindBoxContainer.classList.add('animate-shake');createParticleEffect(elements.blindBoxContainer);
+      setTimeout(()=>{
+        elements.blindBoxContainer.classList.add('hidden');elements.cardRevealContainer.classList.remove('hidden');
+        elements.cardElement.style.transform='rotateY(0deg) scale(0.8)';elements.cardFront.src=card.image;
+        setTimeout(()=>{
+          elements.cardElement.style.transform='rotateY(180deg) scale(1)';
+          setTimeout(()=>{
+            const cfg=appData.rarityConfig[card.rarity];
+            if(cfg){elements.cardFront.parentElement.classList.add(cfg.glow);elements.cardFront.parentElement.style.border=`3px solid ${getComputedStyle(document.querySelector('.'+cfg.color)).backgroundColor}`;}
+            setTimeout(()=>{
+              elements.drawBtn.textContent='再次抽取';elements.drawBtn.disabled=false;
+              elements.winText.innerText=`恭喜“${appData.nickname}”首月通关`;
+              elements.winModal.classList.remove('hidden');showCardDetailModal(card);
+            },800);
+          },600);
+        },300);
+      },1200);
+    }
+    function showCardDetailModal(card){
+      const cfg=appData.rarityConfig[card.rarity];
+      elements.modalCardImage.src=card.image;
+      elements.modalCardRarity.textContent=cfg.name;
+      elements.modalCardRarity.className=`px-3 py-1.5 rounded-full text-white text-sm font-medium ${cfg.color}`;
+      elements.modalCardSeries.textContent=appData.cardSeries[card.series].name;
+      const d=new Date(card.acquiredDate);
+      elements.modalCardDate.textContent=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      elements.modalCardId.textContent=card.id;
+      elements.cardDetailModal.querySelector('.bg-white').className=`bg-white rounded-xl p-6 max-w-md w-full mx-4 animate-bounce-in ${cfg.bg} border-4 ${cfg.color}`;
+      elements.cardDetailModal.classList.remove('hidden');
+    }
+    function renderCollection(filter='all'){
+      const g=elements.collectionGrid;g.innerHTML='';
+      const map={};appData.collection.forEach(c=>{if(!map[c.id]||new Date(c.acquiredDate)>new Date(map[c.id].acquiredDate))map[c.id]=c;});
+      let list=Object.values(map);if(filter!=='all')list=list.filter(x=>x.rarity===filter);
+      if(!list.length){g.innerHTML=`<div class="text-center col-span-full py-8 text-gray-500"><i class="fa fa-book text-4xl mb-2"></i><p>没有找到符合条件的卡片</p></div>`;return;}
+      list.forEach(c=>{
+        const cfg=appData.rarityConfig[c.rarity];
+        const div=document.createElement('div');
+        div.className=`bg-white rounded-lg overflow-hidden card-shadow card-hover ${cfg.bg}`;
+        div.innerHTML=`<div class="relative"><img src="${c.image}" class="w-full h-48 object-cover"><div class="absolute top-1 right-1 px-1.5 py-0.5 rounded-full text-white text-xs ${cfg.color}">${cfg.name}</div></div><div class="p-2"><h4 class="text-sm font-medium truncate">${c.name}</h4><p class="text-xs text-gray-500">${appData.cardSeries[c.series].name}</p></div>`;
+        div.onclick=()=>showCardDetailModal(c);g.appendChild(div);
+      });
+    }
+    function filterCollection(f){renderCollection(f);}
+    document.addEventListener('DOMContentLoaded',initApp);
+  </script>
+</body></html>
